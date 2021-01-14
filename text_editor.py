@@ -1,5 +1,6 @@
+import tkinter.filedialog as fd
 from tkinter import Menu, Scrollbar, Text, Tk
-from tkinter import *
+import tkinter as tk
 
 class TextEditor():
 
@@ -12,7 +13,7 @@ class TextEditor():
         window.title("Text Editor") #give out editor a title
         window.minsize(500,500)     #give dimensions to our editor
         menu_bar = Menu(self.window)
-        menu_bar.add_command(label='File',command=None)
+        menu_bar.add_command(label='Open',command=self.open_file)
         menu_bar.add_command(label = 'Edit', command = window.quit())
         menu_bar.add_command(label = 'Format',command = None)
         menu_bar.add_command(label = 'View',command = None)
@@ -20,12 +21,30 @@ class TextEditor():
         menu_bar.add_command(label = 'Web Search',command = None)
 
         self.scrollbar = Scrollbar(window)
-        self.scrollbar.pack(side=RIGHT,fill=Y) 
-        text_area = Text(window,yscrollcommand=self.scrollbar.set)
-        text_area.pack(expand=True,fill=BOTH)
+        self.scrollbar.pack(side=tk.RIGHT,fill=tk.Y) 
+        self.text_area = Text(window,yscrollcommand=self.scrollbar.set)
+        self.text_area.pack(expand=True,fill=tk.BOTH)
 
         self.window.config(menu = menu_bar)
-        self.scrollbar.config(command=text_area.yview)
+        self.scrollbar.config(command=self.text_area.yview)
+    
+        
+    def open_file(self):
+        """
+        Opening a file to edit.
+        """
+        filepath =fd.askopenfilename(filetypes=[("Text Files", "*.txt"), ("All Files", "*.*")])
+        if not filepath:
+            return
+        self.text_area.delete(1.0, tk.END)
+        with open(filepath, "r") as input_file:
+            text = input_file.read()
+            self.text_area.insert(tk.END, text)
+        window.title(f"Text Editor - {filepath}")
+
+    def save_file(self):
+        pass
+
 
     def run(self):
         """
