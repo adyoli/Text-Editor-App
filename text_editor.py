@@ -2,7 +2,7 @@ import tkinter.filedialog as fd
 from tkinter import Menu, Scrollbar, Text, Tk
 import tkinter as tk
 import highlight
-
+import lineNumbers.line_numbers as ln
 
 class TextEditor():
 
@@ -23,15 +23,20 @@ class TextEditor():
 
         self.scrollbar = Scrollbar(window)
         self.scrollbar.pack(side=tk.RIGHT,fill=tk.Y) 
+
         self.text_area = Text(window,yscrollcommand=self.scrollbar.set)
+        
+        self.window.config(menu = menu_bar)
+        self.scrollbar.config(command=self.text_area.yview)
+
+        l = ln.LineNumbers(window,self.text_area,width=1)
+        l.pack(side=tk.LEFT,fill=tk.Y)
+
         self.text_area.pack(expand=True,fill=tk.BOTH)
         
         h = highlight.Highlighter(self.text_area,'languages/python.yaml')
 
-        self.window.config(menu = menu_bar)
-        self.scrollbar.config(command=self.text_area.yview)
-    
-        
+
     def open_file(self):
         """
         Opening a file to edit.
