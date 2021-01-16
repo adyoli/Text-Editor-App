@@ -1,6 +1,8 @@
 import tkinter.filedialog as fd
 from tkinter import Menu, Scrollbar, Text, Tk
 import tkinter as tk
+import highlight
+
 
 class TextEditor():
 
@@ -23,6 +25,8 @@ class TextEditor():
         self.scrollbar.pack(side=tk.RIGHT,fill=tk.Y) 
         self.text_area = Text(window,yscrollcommand=self.scrollbar.set)
         self.text_area.pack(expand=True,fill=tk.BOTH)
+        
+        h = highlight.Highlighter(self.text_area,'languages/python.yaml')
 
         self.window.config(menu = menu_bar)
         self.scrollbar.config(command=self.text_area.yview)
