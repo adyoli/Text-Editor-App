@@ -1,6 +1,8 @@
 import tkinter.filedialog as fd
 from tkinter import Menu, Scrollbar, Text, Tk
 import tkinter as tk
+import highlight
+import lineNumbers.line_numbers as ln
 
 class TextEditor():
 
@@ -14,37 +16,58 @@ class TextEditor():
         window.minsize(500,500)     #give dimensions to our editor
         menu_bar = Menu(self.window)
         menu_bar.add_command(label='Open',command=self.open_file)
-        menu_bar.add_command(label = 'Edit', command = window.quit())
+        menu_bar.add_command(label = 'Save', command = self.save_file)
         menu_bar.add_command(label = 'Format',command = None)
         menu_bar.add_command(label = 'View',command = None)
-        menu_bar.add_command(label = 'Help', command = window.quit())
         menu_bar.add_command(label = 'Web Search',command = None)
 
         self.scrollbar = Scrollbar(window)
         self.scrollbar.pack(side=tk.RIGHT,fill=tk.Y) 
-        self.text_area = Text(window,yscrollcommand=self.scrollbar.set)
-        self.text_area.pack(expand=True,fill=tk.BOTH)
 
+        self.text_area = Text(window,yscrollcommand=self.scrollbar.set)
+        
         self.window.config(menu = menu_bar)
         self.scrollbar.config(command=self.text_area.yview)
-    
+
+        l = ln.LineNumbers(window,self.text_area,width=1)
+        l.pack(side=tk.LEFT,fill=tk.Y)
+
+        self.text_area.pack(expand=True,fill=tk.BOTH)
         
+        h = highlight.Highlighter(self.text_area,'languages/python.yaml')
+
+
     def open_file(self):
         """
         Opening a file to edit.
         """
-        filepath =fd.askopenfilename(filetypes=[("Text Files", "*.txt"), ("All Files", "*.*")])
-        if not filepath:
+        self.filepath =fd.askopenfilename(filetypes=[("Text Files", "*.txt"), ("All Files", "*.*")])
+        if not self.filepath:
             return
         self.text_area.delete(1.0, tk.END)
-        with open(filepath, "r") as input_file:
+        with open(self.filepath, "r") as input_file:
             text = input_file.read()
             self.text_area.insert(tk.END, text)
-        window.title(f"Text Editor - {filepath}")
+
+        self.name = self.filepath.split("/")[-1]
+        window.title(f"Text Editor - {self.name}")
 
     def save_file(self):
-        pass
+        """
+        Save the current file as a new file.
+        """
 
+        try:
+            filepath = fd.asksaveasfilename(initialfile=self.name,defaultextension="txt",filetypes=[("Text Files", "*.txt"), ("All Files", "*.*")],)
+        except AttributeError:
+            filepath = fd.asksaveasfilename(initialfile='Untitled',defaultextension=".txt",filetypes=[("Text Files", "*.txt"), ("All Files", "*.*")],)
+        if not filepath:
+            return
+        with open(filepath, "w") as output_file:
+            text = self.text_area.get(1.0, tk.END)
+            output_file.write(text)
+        name = filepath.split("/")[-1]
+        window.title(f"Text Editor - {name}")
 
     def run(self):
         """
