@@ -1,3 +1,6 @@
+from cefpython3 import cefpython as cef
+import platform
+import sys
 import tkinter.filedialog as fd
 from tkinter import Menu, Scrollbar, Text, Tk
 import tkinter as tk
@@ -13,7 +16,7 @@ class TextEditor():
     def __init__(self,window):
         self.window = window        #store our window object
         window.title("Text Editor") #give out editor a title
-        window.minsize(500,500)     #give dimensions to our editor
+        window.minsize(300,300)     #give dimensions to our editor
         menu_bar = Menu(self.window)
         menu_bar.add_command(label='Open',command=self.open_file)
         menu_bar.add_command(label = 'Save', command = self.save_file)
@@ -31,10 +34,40 @@ class TextEditor():
 
         l = ln.LineNumbers(window,self.text_area,width=1)
         l.pack(side=tk.LEFT,fill=tk.Y)
-
+        ##########
+        Browser_frame = tk.Frame(window)
+        v = tk.StringVar()
+        self.search = tk.Entry(Browser_frame,textvariable=v, font="Arial 14")
+        self.search_button = tk.Button(Browser_frame,text = "Search",command=self.browser_window)
+        v.set("https://www.google.com/")
+        self.search.pack(fill=tk.X,side=tk.TOP)
+        self.search_button.pack(fill=tk.X,side=tk.TOP)
+        Browser_frame.pack(fill=tk.BOTH,side=tk.RIGHT)
+        ###########
         self.text_area.pack(expand=True,fill=tk.BOTH)
         
         h = highlight.Highlighter(self.text_area,'languages/python.yaml')
+
+
+    def browser_entry(self):
+        self.search = tk.Entry(window, font="Arial 14")
+        self.search.pack(side=tk.RIGHT)
+
+
+    def open_link(self,url):
+        print(url)
+        sys.excepthook = cef.ExceptHook  # To shutdown all CEF processes on error
+        cef.Initialize()
+        self.browser_win = cef.CreateBrowserSync(url=url,window_title=url)
+        #self.browser_win.pack()
+        cef.MessageLoop()
+
+    def browser_window(self):
+        self.search.focus()
+        url = self.search.get()
+        #self.search.bind("<Return>", lambda x: self.open_link(url))
+        self.open_link(url)
+        #print(url)
 
 
     def open_file(self):
